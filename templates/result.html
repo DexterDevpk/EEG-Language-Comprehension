@@ -80,9 +80,9 @@
         <p><strong>Expected Status:</strong> {{ result.expected_status }}</p>
         <p><strong>Model Prediction:</strong> {{ result.predicted_status }}</p>
         {% if result.correct_prediction %}
-            <p class="success">✅ Model correctly predicted the language status.</p>
+            <p class="success">✅ The Stimulus Language is Native to the Subject</p>
         {% else %}
-            <p class="error">❌ Model misclassified the language status.</p>
+            <p class="error">❌ The Stimulus Language is Non-Native to the Subject</p>
         {% endif %}
         <a href="{{ url_for('index') }}">Try Again</a>
     </div>
