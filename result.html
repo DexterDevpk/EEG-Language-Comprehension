@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            text-align: left;
+            font-size: 1em;
+            color: #444;
+            margin: 10px 0;
+        }
+
+        p strong {
+            color: #333;
+        }
+
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        a:hover {
+            background: #2980b9;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediction Result</h1>
+        <p><strong>Subject ID:</strong> {{ result.subject_id }}</p>
+        <p><strong>Stimulus Language:</strong> {{ result.stimulus_language }}</p>
+        <p><strong>Subject's Native Language:</strong> {{ result.native_language }}</p>
+        <p><strong>Expected Status:</strong> {{ result.expected_status }}</p>
+        <p><strong>Model Prediction:</strong> {{ result.predicted_status }}</p>
+        {% if result.correct_prediction %}
+            <p class="success">✅ Model correctly predicted the language status.</p>
+        {% else %}
+            <p class="error">❌ Model misclassified the language status.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}">Try Again</a>
+    </div>
+</body>
+</html>
