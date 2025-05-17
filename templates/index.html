@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>EEG Language Comprehension Predictor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #nativelanguageheading {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #444;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        input[readonly] {
+            text-align: center;
+            background: #ffffff;
+            border: none;
+            font-size: x-large;
+            color: #3d2fff;
+        }
+
+        button {
+            margin-top: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        li {
+            color: #e74c3c;
+            margin-top: 5px;
+        }
+
+        #native_language_message {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 5px;
+            min-height: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EEG Language Predictor</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form action="/" method="POST" enctype="multipart/form-data">
+            <label>Subject ID:</label>
+            <input type="text" name="subject_id" placeholder="e.g. S02" required>
+
+            <div id="nativelanguageheading">
+              <strong>Native Language:</strong> 
+              <span id="native_language_display" style="color: blue; font-weight: 700;"></span>
+            </div>
+
+            <p id="native_language_message"></p>
+
+            <label>Stimulus Language:</label>
+            <input type="text" name="stimulus_language" placeholder="e.g. Italian" required>
+
+            <label>Upload EEG CSV files:</label>
+            <input type="file" name="eeg_files" multiple accept=".csv" required>
+
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+
+    <script>
+        const subjectIdInput = document.querySelector('input[name="subject_id"]');
+        const nativeLanguageDisplay = document.getElementById('native_language_display');
+        const nativeLanguageMessage = document.getElementById('native_language_message');
+
+        subjectIdInput.addEventListener('input', function() {
+            const subjectId = subjectIdInput.value.trim();
+            if (subjectId.length === 0) {
+                nativeLanguageDisplay.textContent = '';
+                nativeLanguageMessage.textContent = '';
+                return;
+            }
+
+            fetch('/get_native_language', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({subject_id: subjectId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                nativeLanguageDisplay.textContent = data.native_language || '';
+                nativeLanguageMessage.textContent = data.message || '';
+            })
+            .catch(err => {
+                nativeLanguageDisplay.textContent = '';
+                nativeLanguageMessage.textContent = 'Error fetching native language.';
+                console.error(err);
+            });
+        });
+    </script>
+</body>
+</html>
