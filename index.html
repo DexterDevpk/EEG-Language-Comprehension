@@ -1,164 +1,198 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>EEG Language Comprehension Predictor</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f7f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        #nativelanguageheading {
-            font-size: 1.2em;
-            margin-top: 20px;
-            color: #333;
-            text-align: left;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            width: 400px;
-            text-align: center;
-        }
+  <meta charset="UTF-8" />
+  <title>EEG Language Comprehension Predictor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        h1 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #333;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+    }
 
-        label {
-            display: block;
-            text-align: left;
-            font-weight: bold;
-            margin-top: 15px;
-            color: #444;
-        }
+    video#bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
 
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      padding: 40px;
+      width: 400px;
+      margin: auto;
+      margin-top: 5vh;
+      color: #fff;
+      animation: fadeIn 1.5s ease;
+    }
 
-        input[readonly] {
-            text-align: center;
-            background: #ffffff;
-            border: none;
-            font-size: x-large;
-            color: #3d2fff;
-        }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px #000;
+    }
 
-        button {
-            margin-top: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
+    label {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      margin-top: 15px;
+      color: #ddd;
+    }
 
-        button:hover {
-            background: #45a049;
-        }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.7);
+      color: #222;
+      font-weight: bold;
+    }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 10px;
-        }
+    input[readonly] {
+      background: none;
+      border: none;
+      font-size: x-large;
+      color: #00ffea;
+      text-align: center;
+    }
 
-        li {
-            color: #e74c3c;
-            margin-top: 5px;
-        }
+    button {
+      margin-top: 20px;
+      background: #4caf50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
 
-        #native_language_message {
-            color: #e74c3c;
-            font-weight: bold;
-            margin-top: 5px;
-            min-height: 1.2em;
-        }
-    </style>
+    button:hover {
+      background: #43a047;
+      transform: scale(1.05);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    li {
+      color: #ffcccc;
+      margin-top: 5px;
+    }
+
+    #nativelanguageheading {
+      font-size: 1.2em;
+      margin-top: 20px;
+      color: #c5f5ff;
+      text-align: left;
+    }
+
+    #native_language_message {
+      color: #ff8585;
+      font-weight: bold;
+      margin-top: 5px;
+      min-height: 1.2em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>EEG Language Predictor</h1>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul>
-              {% for message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-        <form action="/" method="POST" enctype="multipart/form-data">
-            <label>Subject ID:</label>
-            <input type="text" name="subject_id" placeholder="e.g. S02" required>
+  <!-- Background Video -->
+  <video autoplay muted loop id="bg-video">
+    <source src="eeg-background.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-            <div id="nativelanguageheading">
-              <strong>Native Language:</strong> 
-              <span id="native_language_display" style="color: blue; font-weight: 700;"></span>
-            </div>
+  <div class="container">
+    <h1>EEG Language Predictor</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 
-            <p id="native_language_message"></p>
+    <form action="/" method="POST" enctype="multipart/form-data">
+      <label>Subject ID:</label>
+      <input type="text" name="subject_id" placeholder="e.g. S02" required>
 
-            <label>Stimulus Language:</label>
-            <input type="text" name="stimulus_language" placeholder="e.g. Italian" required>
+      <div id="nativelanguageheading">
+        <strong>Native Language:</strong>
+        <span id="native_language_display" style="color: #00ffc8; font-weight: 700;"></span>
+      </div>
 
-            <label>Upload EEG CSV files:</label>
-            <input type="file" name="eeg_files" multiple accept=".csv" required>
+      <p id="native_language_message"></p>
 
-            <button type="submit">Predict</button>
-        </form>
-    </div>
+      <label>Stimulus Language:</label>
+      <input type="text" name="stimulus_language" placeholder="e.g. Italian" required>
 
-    <script>
-        const subjectIdInput = document.querySelector('input[name="subject_id"]');
-        const nativeLanguageDisplay = document.getElementById('native_language_display');
-        const nativeLanguageMessage = document.getElementById('native_language_message');
+      <label>Upload EEG CSV files:</label>
+      <input type="file" name="eeg_files" multiple accept=".csv" required>
 
-        subjectIdInput.addEventListener('input', function() {
-            const subjectId = subjectIdInput.value.trim();
-            if (subjectId.length === 0) {
-                nativeLanguageDisplay.textContent = '';
-                nativeLanguageMessage.textContent = '';
-                return;
-            }
+      <button type="submit">Predict</button>
+    </form>
+  </div>
 
-            fetch('/get_native_language', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({subject_id: subjectId})
-            })
-            .then(response => response.json())
-            .then(data => {
-                nativeLanguageDisplay.textContent = data.native_language || '';
-                nativeLanguageMessage.textContent = data.message || '';
-            })
-            .catch(err => {
-                nativeLanguageDisplay.textContent = '';
-                nativeLanguageMessage.textContent = 'Error fetching native language.';
-                console.error(err);
-            });
+  <script>
+    const subjectIdInput = document.querySelector('input[name="subject_id"]');
+    const nativeLanguageDisplay = document.getElementById('native_language_display');
+    const nativeLanguageMessage = document.getElementById('native_language_message');
+
+    subjectIdInput.addEventListener('input', function () {
+      const subjectId = subjectIdInput.value.trim();
+      if (subjectId.length === 0) {
+        nativeLanguageDisplay.textContent = '';
+        nativeLanguageMessage.textContent = '';
+        return;
+      }
+
+      fetch('/get_native_language', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ subject_id: subjectId })
+      })
+        .then(response => response.json())
+        .then(data => {
+          nativeLanguageDisplay.textContent = data.native_language || '';
+          nativeLanguageMessage.textContent = data.message || '';
+        })
+        .catch(err => {
+          nativeLanguageDisplay.textContent = '';
+          nativeLanguageMessage.textContent = 'Error fetching native language.';
+          console.error(err);
         });
-    </script>
+    });
+  </script>
 </body>
 </html>
